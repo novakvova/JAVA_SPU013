@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const callouts = [
   {
     name: "Desk and Office",
@@ -50,6 +52,14 @@ const Home = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl py-2 sm:py-5 lg:max-w-none lg:py-10">
           <h2 className="text-2xl font-bold text-gray-900">Collections</h2>
+          <div className="py-2">
+            <Link
+              to="/categories/create"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            >
+              Додати категорію
+            </Link>
+          </div>
 
           <div className="mt-6 space-y-12 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:space-y-0">
             {callouts.map((callout) => (

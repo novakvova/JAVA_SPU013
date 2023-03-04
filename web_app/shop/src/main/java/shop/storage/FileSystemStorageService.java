@@ -3,7 +3,12 @@ package shop.storage;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -49,16 +54,83 @@ public class FileSystemStorageService implements StorageService {
                 throw new StorageException("Пустий base64");
             }
             UUID uuid = UUID.randomUUID();
-            String randomFileName = uuid.toString()+".jpg";
             String [] charArray = base64.split(",");
+            String extension;
+            switch(charArray[0]) {
+                case "data:image/png;base64":
+                    extension="png";
+                    break;
+                default:
+                    extension="jpg";
+                    break;
+            }
+            String randomFileName = uuid.toString()+"."+extension;
             Base64.Decoder decoder = Base64.getDecoder();
             byte [] bytes = new byte[0];
             bytes = decoder.decode(charArray[1]);
-            String folder = rootLocation.toString()+"/"+randomFileName;
-            new FileOutputStream(folder).write(bytes);
+            int [] imageSize = {32,150, 300, 600, 1200};
+            try(var byteStream = new ByteArrayInputStream(bytes)) {
+                var image = ImageIO.read(byteStream);
+                for(int size : imageSize) {
+                    String fileSaveItem = rootLocation.toString()+"/"+size+"_"+randomFileName;
+                    BufferedImage newImg = ImageUtils.resizeImage(image,
+                            extension=="jpg" ? ImageUtils.IMAGE_JPEG: ImageUtils.IMAGE_PNG, size, size);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ImageIO.write(newImg, extension, byteArrayOutputStream);
+                    byte [] newBytes = byteArrayOutputStream.toByteArray();
+                    FileOutputStream out = new FileOutputStream(fileSaveItem);
+                    out.write(newBytes);
+                    out.close();
+                }
+            } catch(IOException e) {
+                throw new StorageException("Проблема перетворення фото", e);
+            }
             return randomFileName;
-        } catch(IOException e) {
+
+        } catch(StorageException e) {
             throw new StorageException("Проблема при збережні та перетворені base64",e);
         }
+    }
+
+    @Override
+    public String saveMultipartFile(MultipartFile file) {
+        try {
+            UUID uuid = UUID.randomUUID();
+            String extension="jpg";
+            String randomFileName = uuid.toString()+"."+extension;
+            Base64.Decoder decoder = Base64.getDecoder();
+            byte [] bytes = file.getBytes();
+            int [] imageSize = {32,150, 300, 600, 1200};
+            try(var byteStream = new ByteArrayInputStream(bytes)) {
+                var image = ImageIO.read(byteStream);
+                for(int size : imageSize) {
+                    String fileSaveItem = rootLocation.toString()+"/"+size+"_"+randomFileName;
+                    BufferedImage newImg = ImageUtils.resizeImage(image,
+                            extension=="jpg" ? ImageUtils.IMAGE_JPEG: ImageUtils.IMAGE_PNG, size, size);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ImageIO.write(newImg, extension, byteArrayOutputStream);
+                    byte [] newBytes = byteArrayOutputStream.toByteArray();
+                    FileOutputStream out = new FileOutputStream(fileSaveItem);
+                    out.write(newBytes);
+                    out.close();
+                }
+            } catch(IOException e) {
+                throw new StorageException("Проблема перетворення фото", e);
+            }
+            return randomFileName;
+
+        } catch(Exception e) {
+            throw new StorageException("Проблема при збережні та перетворені base64",e);
+        }
+    }
+
+    @Override
+    public void removeFile(String name) {
+
+    }
+
+    @Override
+    public Path load(String filename) {
+        return null;
     }
 }

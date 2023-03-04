@@ -1,17 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Navbar from './components/tailwind/Navbars';
-import Pagination from './components/tailwind/Pagination';
-import Home from './components/home';
+import React from "react";
+import "./App.css";
+import Home from "./components/home";
+import { Route, Routes } from "react-router-dom";
+import DefaultLayout from "./components/containers/default";
+import CategoryCratePage from "./components/categories/create";
 
 function App() {
   return (
     <>
-      <Navbar/>
-      {/* <Pagination/> */}
-      {/* <h1 className="text-3xl font-bold underline">Hello world!</h1> */}
-      <Home/>
+      <Routes>
+        <Route path="/" element={<DefaultLayout />}>
+          <Route index element={<Home />} />
+          <Route path="categories/create" element={<CategoryCratePage />} />
+        </Route>
+      </Routes>
     </>
   );
 }
