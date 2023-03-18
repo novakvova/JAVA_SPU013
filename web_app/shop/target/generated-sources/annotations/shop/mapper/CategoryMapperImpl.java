@@ -10,7 +10,7 @@ import shop.entities.CategoryEntity;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-02-25T13:02:25+0200",
+    date = "2023-03-18T09:12:15+0200",
     comments = "version: 1.5.3.Final, compiler: javac, environment: Java 19.0.2 (Oracle Corporation)"
 )
 @Component
