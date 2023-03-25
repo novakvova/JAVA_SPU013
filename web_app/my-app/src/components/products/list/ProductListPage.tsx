@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { APP_ENV } from "../../../env";
+import ModalDelete from "../../common/modal/delete";
 import { IProductItem } from "../types";
 import "./style.css";
 
@@ -17,6 +18,16 @@ const ProductListPage = () => {
         console.log("Server result", resp);
       });
   }, []);
+
+  const deleteProductHandler = (id: number) => {
+    //console.log("Delete product id", id);
+    axios.delete(`${APP_ENV.REMOTE_HOST_NAME}api/products/${id}`)
+      .then(resp =>{
+        setList(list.filter(x=>x.id!==id));
+      });
+  };
+
+
 
   const content = list.map((p) => (
     <div key={p.id}>
@@ -45,6 +56,12 @@ const ProductListPage = () => {
           className="py-2 px-4 bg-white border border-gray-200 text-gray-600 rounded hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50">
           Змінить
         </Link>
+        <ModalDelete
+          id={p.id}
+          title="Видалення"
+          text={`Ви дійсно бажаєте видалить '${p.name}'?`}
+          deleteFunc={deleteProductHandler}
+        />
       </div>
     </div>
   ));
